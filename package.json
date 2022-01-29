@@ -1,0 +1,31 @@
+{
+  "name": "nearhackathon",
+  "version": "1.0.0",
+  "description": "Web3 based web game for the NEAR hackathon",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MGM103/NearHackathon.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MGM103/NearHackathon/issues"
+  },
+  "homepage": "https://github.com/MGM103/NearHackathon#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.4.2",
+    "hardhat": "^2.8.3"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.4",
+    "@nomiclabs/hardhat-waffle": "^2.0.2",
+    "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.5.3"
+  }
+}
