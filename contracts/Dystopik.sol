@@ -12,15 +12,24 @@ contract Dystopik is ERC721Enumerable {
     using Counters for Counters.Counter;
     Counters.Counter public _characterID;
 
+    //Contains the avatar images for the different characters that can be created
+    string[] imageURIs;
+
     //Connecting token ID to respective characteristics
     mapping(uint256 => uint256) public xp;
     mapping(uint256 => uint256) public level;
     mapping(uint256 => uint256) public architype;
+    mapping(uint256 => string) public imageURI;
 
     event characterCreated(address indexed owner, uint256 characterID, uint256 architype);
     event leveledUp(address indexed owner, uint256 characterID, uint256 level);
 
-    constructor() ERC721("Dystopik", "DYST"){
+    constructor(string[] memory _imageURIs) ERC721("Dystopik", "DYST"){
+        //Setting the avatars for the character types
+        for(uint256 i = 0; i < _imageURIs.length; i++){
+            imageURIs.push(_imageURIs[i]);
+        }
+
         //The first character to be minted should have an ID of 1
         _characterID.increment();
     }
@@ -31,6 +40,7 @@ contract Dystopik is ERC721Enumerable {
         uint256 nextID = _characterID.current();
         architype[nextID] = _architype;
         level[nextID] = 1;
+        imageURI[nextID] = imageURIs[_architype - 1];
 
         _safeMint(msg.sender, nextID);
 
@@ -39,33 +49,13 @@ contract Dystopik is ERC721Enumerable {
         _characterID.increment();
     }
 
-    function getCharacter(uint256 _tokenID) external view returns(uint256, uint256, uint256){
+    function getCharacter(uint256 _tokenID) external view returns(uint256, uint256, uint256, string memory){
         uint256 _xp = xp[_tokenID];
         uint256 _level = level[_tokenID];
         uint256 _architype = architype[_tokenID];
+        string memory _imageURI = imageURI[_tokenID];
 
-        return (_xp, _level, _architype);
-    }
-
-    function tokenURI(uint256 _tokenID) public view override returns(string memory){
-        string memory strLevel = Strings.toString(level[_tokenID]);
-        string memory strXp = Strings.toString(xp[_tokenID]);
-        string memory strNextLvlXp = Strings.toString(nextLevelXp(level[_tokenID]));
-        string memory strArchitype = Strings.toString(architype[_tokenID]);
-        string memory strID = Strings.toString(_tokenID);
-
-        string memory json = Base64.encode(abi.encodePacked(
-            '{"name": "Denizen #',
-            strID,
-            '", "description": "This token is your avatar in the Dystopik metaverse. Players will battle the environment as well as each other to either restore peace or fan the flames of chaos. The fate of the world is up to the players.",', 
-            '"image": "',
-            //to be added,
-            '", "attributes": [ { "trait_type": "Xp", "value": "',strXp,'", "max_value": "',strNextLvlXp,'"}, { "trait_type": "Level", "value": "',
-            strLevel,'"}, {"trait_type": "Architype", "value":"', strArchitype ,'"} ]}'
-        ));
-
-        string memory output = string(abi.encodePacked("data:application/json;base64,", json));
-        return output;
+        return (_xp, _level, _architype, _imageURI);
     }
 
     function levelUp(uint256 _tokenID) external {
