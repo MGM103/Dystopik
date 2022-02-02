@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -35,7 +34,7 @@ contract Dystopik is ERC721Enumerable {
     }
 
     function createCharacter(uint256 _architype) external {
-        require(_architype >= 1 && _architype < 4);
+        require(_architype >= 1 && _architype < 4, "Architype does not exist");
         
         uint256 nextID = _characterID.current();
         architype[nextID] = _architype;
@@ -59,8 +58,8 @@ contract Dystopik is ERC721Enumerable {
     }
 
     function levelUp(uint256 _tokenID) external {
-        require(_isApprovedOrOwner(msg.sender, _tokenID));
-        require(canLevelUp(_tokenID));
+        require(_isApprovedOrOwner(msg.sender, _tokenID), "You do not have approval to perform this action");
+        require(canLevelUp(_tokenID), "Insufficent xp");
 
         uint256 currentLvl = level[_tokenID];
         uint256 currentXp = xp[_tokenID];

@@ -44,6 +44,51 @@ describe("Dystopik", () => {
   });
 
   it("Reverts when given an out of bounds character type", async () => {
+    const characterTypes = [0, 4];
+
+    for(i = 0; i < characterTypes.length; i++){
+      await expect(
+        dystopikContract.createCharacter(characterTypes[i])
+      ).to.be.revertedWith(
+        "Architype does not exist"
+      );
+    }
+  });
+
+  it("Returns the correct string for the given architype", async () => {
+    const architypes = [1, 2, 3];
+    const expectedStrings = ["Chimera", "Android", "AI"];
+    let archTx;
     
-  })
+    for(i = 0; i < architypes.length; i++){
+      archTx = await dystopikContract.architypeToString(architypes[i]);
+      expect(archTx).to.equal(expectedStrings[i]);
+    }
+  });
+
+  it("Reverts when a non-owner who doesn't have approval attempts to level up a character", async () => {
+    const characterType = 1;
+    const tokenID = 1;
+
+    let txn = await dystopikContract.createCharacter(characterType);
+    await txn.wait();
+
+    await expect(
+      dystopikContract.connect(addr1).levelUp(tokenID)
+    ).to.be.revertedWith("You do not have approval to perform this action");
+  });
+
+  it("Reverts when a non-owner who doesn't have approval attempts to level up a character", async () => {
+    const characterType = 1;
+    const tokenID = 1;
+
+    let txn = await dystopikContract.createCharacter(characterType);
+    await txn.wait();
+
+    await expect(
+      dystopikContract.levelUp(tokenID)
+    ).to.be.revertedWith("Insufficent xp");
+  });
+
+  //NOTE: level up core logic to be tested in the first quest smart contract
 });
