@@ -34,7 +34,7 @@ contract Attributes {
     function setInitAttributes(uint256 _tokenID, uint256 _strength, uint256 _speed, uint256 _fortitude, uint256 _technical, uint256 _reflexes, uint256 _luck) external {
         require(_isApprovedOrOwner(_tokenID), "You do not have permission to set attributes");
         require(!initAttributesSet[_tokenID], "Initial attributes have already been set");
-        require(calcInitAttributes(_strength, _speed, _fortitude, _technical, _reflexes, _luck));
+        require(calcInitAttributes(_strength, _speed, _fortitude, _technical, _reflexes, _luck), "All initial attribute points must be used");
 
         initAttributesSet[_tokenID] = true;
         idToAttributes[_tokenID] = CharAttributes(
@@ -49,13 +49,13 @@ contract Attributes {
         emit initialisedAttributes(msg.sender, _tokenID, _strength, _speed, _fortitude, _technical, _reflexes, _luck);
     }
 
-    function calcInitAttributes(uint256 _strength, uint256 _speed, uint256 _fortitude, uint256 _technical, uint256 _reflexes, uint256 _luck) public pure returns(bool){
+    function calcInitAttributes(uint256 _strength, uint256 _speed, uint256 _fortitude, uint256 _technical, uint256 _reflexes, uint256 _luck) internal pure returns(bool){
         uint256 initSpendTotal = _strength + _speed + _fortitude + _technical + _reflexes + _luck;
 
         if(initSpendTotal == initAttributePoints){
-            return false;
-        }else{
             return true;
+        }else{
+            return false;
         }
     }
 
@@ -70,7 +70,7 @@ contract Attributes {
         attributePointsSpent[_tokenID] += 1;
     }
 
-    function calcAvailablePts(uint256 _tokenID) internal view returns(uint256){
+    function calcAvailablePts(uint256 _tokenID) public view returns(uint256){
         uint256 currentLvl = dyst.level(_tokenID);
         uint availablePts = (currentLvl - 1) * 5;
         return availablePts;
