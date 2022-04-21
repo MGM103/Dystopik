@@ -90,5 +90,23 @@ describe("Dystopik", () => {
     ).to.be.revertedWith("Insufficent xp");
   });
 
+  it("Assigns roles correctly", async () => {
+    const DEFAULT_ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000';
+    const role_bytes = ethers.utils.toUtf8Bytes("XP_GIVER")
+    const XP_GIVER = ethers.utils.keccak256(role_bytes);
+
+    let txn = await dystopikContract.hasRole(DEFAULT_ADMIN_ROLE, owner.address);
+    expect(txn).to.equal(true);
+
+    txn = await dystopikContract.hasRole(XP_GIVER, owner.address);
+    expect(txn).to.equal(true);
+
+    txn = await dystopikContract.hasRole(DEFAULT_ADMIN_ROLE, addr1.address);
+    expect(txn).to.equal(false);
+
+    txn = await dystopikContract.hasRole(XP_GIVER, addr1.address);
+    expect(txn).to.equal(false);
+  });
+
   //NOTE: level up core logic to be tested in the first quest smart contract
 });
