@@ -133,5 +133,105 @@ describe("Attributes", () => {
       let currAttr = await attributesContract.idToAttributes(id);
       expect(currAttr.strength).to.equal(strength + expectedSpend);
     });
+
+    it("Levels up speed", async () => {
+      let txn = await attributesContract.increaseSpd(id);
+      await txn.wait();
+
+      expect(txn).to.emit(attributesContract, "attributesUpgraded");
+
+      const expectedSpend = 1;
+      let pointsSpent = await attributesContract.idToAttributePointsSpent(id);
+      expect(pointsSpent).to.equal(expectedSpend);
+
+      let currAttr = await attributesContract.idToAttributes(id);
+      expect(currAttr.speed).to.equal(speed + expectedSpend);
+    });
+
+    it("Levels up fortitude", async () => {
+      let txn = await attributesContract.increaseFort(id);
+      await txn.wait();
+
+      expect(txn).to.emit(attributesContract, "attributesUpgraded");
+
+      const expectedSpend = 1;
+      let pointsSpent = await attributesContract.idToAttributePointsSpent(id);
+      expect(pointsSpent).to.equal(expectedSpend);
+
+      let currAttr = await attributesContract.idToAttributes(id);
+      expect(currAttr.fortitude).to.equal(fortitude + expectedSpend);
+    });
+
+    it("Levels up technical", async () => {
+      let txn = await attributesContract.increaseTech(id);
+      await txn.wait();
+
+      expect(txn).to.emit(attributesContract, "attributesUpgraded");
+
+      const expectedSpend = 1;
+      let pointsSpent = await attributesContract.idToAttributePointsSpent(id);
+      expect(pointsSpent).to.equal(expectedSpend);
+
+      let currAttr = await attributesContract.idToAttributes(id);
+      expect(currAttr.technical).to.equal(technical + expectedSpend);
+    });
+
+    it("Levels up instinct", async () => {
+      let txn = await attributesContract.increaseInstinct(id);
+      await txn.wait();
+
+      expect(txn).to.emit(attributesContract, "attributesUpgraded");
+
+      const expectedSpend = 1;
+      let pointsSpent = await attributesContract.idToAttributePointsSpent(id);
+      expect(pointsSpent).to.equal(expectedSpend);
+
+      let currAttr = await attributesContract.idToAttributes(id);
+      expect(currAttr.instinct).to.equal(instinct + expectedSpend);
+    });
+
+    it("Levels up dexterity", async () => {
+      let txn = await attributesContract.increaseDex(id);
+      await txn.wait();
+
+      expect(txn).to.emit(attributesContract, "attributesUpgraded");
+
+      const expectedSpend = 1;
+      let pointsSpent = await attributesContract.idToAttributePointsSpent(id);
+      expect(pointsSpent).to.equal(expectedSpend);
+
+      let currAttr = await attributesContract.idToAttributes(id);
+      expect(currAttr.dexterity).to.equal(dexterity + expectedSpend);
+    });
+
+    it("Levels up luck", async () => {
+      let txn = await attributesContract.increaseLuck(id);
+      await txn.wait();
+
+      expect(txn).to.emit(attributesContract, "attributesUpgraded");
+
+      const expectedSpend = 1;
+      let pointsSpent = await attributesContract.idToAttributePointsSpent(id);
+      expect(pointsSpent).to.equal(expectedSpend);
+
+      let currAttr = await attributesContract.idToAttributes(id);
+      expect(currAttr.luck).to.equal(luck + expectedSpend);
+    });
+
+    it("Reverts if point spend is greater than available points", async () => {
+      let availablePts = 5;
+
+      for(let i = 0; i <= availablePts; i++){
+        if(i == availablePts){
+          await expect(
+            attributesContract.increaseLuck(id)
+          ).to.be.revertedWith("Insufficent attribute points");
+        }else{
+          let txn = await attributesContract.increaseFort(id);
+          await txn.wait();
+        }
+      }
+
+    });
   });
 });

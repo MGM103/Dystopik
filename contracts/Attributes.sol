@@ -171,10 +171,22 @@ contract Attributes {
     }
 
     /**
+     *  This function increasese the technical of a character.
+     *  @param _tokenID {uint256} - The charachter whose technical is being upgraded.
+     */
+    function increaseInstinct(uint256 _tokenID) external {
+        updateAttributes(_tokenID);
+        CharAttributes storage attributeLvls = idToAttributes[_tokenID];
+        attributeLvls.instinct += 1;
+
+        emit attributesUpgraded(msg.sender, _tokenID, attributeLvls.strength, attributeLvls.speed, attributeLvls.fortitude, attributeLvls.technical, attributeLvls.instinct, attributeLvls.dexterity, attributeLvls.luck);
+    }
+
+    /**
      *  This function increasese the reflexes of a character.
      *  @param _tokenID {uint256} - The charachter whose reflexes are being upgraded.
      */
-    function increaseRflx(uint256 _tokenID) external {
+    function increaseDex(uint256 _tokenID) external {
         updateAttributes(_tokenID);
         CharAttributes storage attributeLvls = idToAttributes[_tokenID];
         attributeLvls.dexterity += 1;
