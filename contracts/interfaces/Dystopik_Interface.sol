@@ -1,5 +1,5 @@
-//SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
 
 interface Dystopik_Interface {
     function level(uint) external view returns (uint256);

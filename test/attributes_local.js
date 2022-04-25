@@ -6,6 +6,8 @@ describe("Attributes", () => {
   let dystopikContract;
   let attributesContract;
   let owner, addr1;
+  const id = 1;
+  const strength = 5, speed = 5, fortitude = 5, technical = 2, instinct = 2, dexterity = 3, luck = 3;
 
   beforeEach(async () => {
     //Constructor arguement for dystopik
@@ -20,7 +22,8 @@ describe("Attributes", () => {
     await dystopikContract.deployed();
 
     //mint a character
-    let mintTx = await dystopikContract.createCharacter(1);
+    const architype = 1;
+    let mintTx = await dystopikContract.createCharacter(architype);
     await mintTx.wait();
 
     //constructor argument for attribute contract
@@ -33,46 +36,102 @@ describe("Attributes", () => {
     [owner, addr1] = await ethers.getSigners();
   })
 
-  it("Will emit an event when initial attributes are set", async () => {
-    const id = 1;
-    let strength = 5, speed = 5, fortitude = 5, technical = 2, reflexes = 5, luck = 3;
-
-    await expect(
-        attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, reflexes, luck)
-    ).to.emit(attributesContract, "initialisedAttributes");
-  });
-
-  it("Will return 0 points available for a newly created character", async () => {
-    const id = 1;
-    let strength = 5, speed = 5, fortitude = 5, technical = 2, reflexes = 5, luck = 3;
+  it("Will emit an event when initial attributes are set and set available pts to 0", async () => {
     const expectedPts = 0;
 
-    let setTx = await attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, reflexes, luck);
-    await setTx.wait();
+    await expect(
+        attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, instinct, dexterity, luck)
+    ).to.emit(attributesContract, "initialisedAttributes");
 
-    setTx = await attributesContract.calcAvailablePts(id);
+    let txn = await attributesContract.calcAvailablePts(id);
+    expect(txn).to.equal(expectedPts);
 
-    expect(setTx).to.equal(expectedPts);
+    let initSetBool = await attributesContract.initAttributesSet(id);
+    expect(initSetBool).to.equal(true);
+
+    let currAttr = await attributesContract.idToAttributes(id);
+    expect(currAttr.strength).to.equal(strength);
+    expect(currAttr.speed).to.equal(speed);
+    expect(currAttr.fortitude).to.equal(fortitude);
+    expect(currAttr.technical).to.equal(technical);
+    expect(currAttr.instinct).to.equal(instinct);
+    expect(currAttr.dexterity).to.equal(dexterity);
+    expect(currAttr.luck).to.equal(luck);
   });
 
   it("Will not let you set the attributes if you are not the owner or approved", async () => {
-    const id = 1;
-    let strength = 5, speed = 5, fortitude = 5, technical = 2, reflexes = 5, luck = 3;
-
     await expect(
-        attributesContract.connect(addr1).setInitAttributes(id, strength, speed, fortitude, technical, reflexes, luck)
+        attributesContract.connect(addr1).setInitAttributes(id, strength, speed, fortitude, technical, instinct, dexterity, luck)
     ).to.be.revertedWith("You do not have permission to set attributes");
   });
 
   it("Will not let you set the attributes if they have already been set", async () => {
-    const id = 1;
-    let strength = 5, speed = 5, fortitude = 5, technical = 2, reflexes = 5, luck = 3;
-
-    let setTx = await attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, reflexes, luck);
+    let setTx = await attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, instinct, dexterity, luck);
     await setTx.wait();
 
     await expect(
-        attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, reflexes, luck)
+        attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, instinct, dexterity, luck)
     ).to.be.revertedWith("Initial attributes have already been set");
+  });
+
+  it("Will revert if all initial attribute points aren't spent", async () => {
+    const invStr = 1;
+
+    await expect(
+      attributesContract.setInitAttributes(id, invStr, speed, fortitude, technical, instinct, dexterity, luck)
+    ).to.be.revertedWith("All initial attribute points must be used");
+  });
+
+  it("Will revert attribute upgrade if character has insufficient attribute points", async () => {
+    let txn = await attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, instinct, dexterity, luck);
+    await txn.wait();
+
+    await expect(
+      attributesContract.increaseStr(id)
+    ).to.be.revertedWith("Insufficent attribute points");
+  });
+
+  it("Will revert attribute upgrade if msg sender isn't owner or approved", async () => {
+    let txn = await attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, instinct, dexterity, luck);
+    await txn.wait();
+
+    await expect(
+      attributesContract.connect(addr1).increaseStr(id)
+    ).to.be.revertedWith("You do not have permission to upgrade attributes");
+  });
+
+  it("Will revert attribute upgrade if attributes aren't set", async () => {
+    await expect(
+      attributesContract.increaseStr(id)
+    ).to.be.revertedWith("Initial attributes have not been set");
+  });
+
+  context("Increasing attributes when they've been set and are lvl 2", async () => {
+    beforeEach(async () => {
+      const givenXp = 100;
+
+      let txn = await dystopikContract.gainXp(id, givenXp);
+      await txn.wait();
+
+      let lvlUpTxn = await dystopikContract.levelUp(id);
+      await lvlUpTxn.wait();
+
+      let setTxn = await attributesContract.setInitAttributes(id, strength, speed, fortitude, technical, instinct, dexterity, luck);
+      await setTxn.wait();
+    });
+
+    it("Levels up strength", async () => {
+      let txn = await attributesContract.increaseStr(id);
+      await txn.wait();
+
+      expect(txn).to.emit(attributesContract, "attributesUpgraded");
+
+      const expectedSpend = 1;
+      let pointsSpent = await attributesContract.idToAttributePointsSpent(id);
+      expect(pointsSpent).to.equal(expectedSpend);
+
+      let currAttr = await attributesContract.idToAttributes(id);
+      expect(currAttr.strength).to.equal(strength + expectedSpend);
+    });
   });
 });
