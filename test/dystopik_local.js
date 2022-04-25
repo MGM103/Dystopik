@@ -78,7 +78,7 @@ describe("Dystopik", () => {
     ).to.be.revertedWith("You do not have approval to perform this action");
   });
 
-  it("Reverts when a non-owner who doesn't have approval attempts to level up a character", async () => {
+  it("Reverts when a character has insufficient xp to level up", async () => {
     const characterType = 1;
     const tokenID = 1;
 
@@ -108,5 +108,72 @@ describe("Dystopik", () => {
     expect(txn).to.equal(false);
   });
 
-  //NOTE: level up core logic to be tested in the first quest smart contract
+  describe("Dystopik Xp", async () => {
+    const charType = 1;
+    const charID = 1;
+
+    beforeEach(async () => {
+      mintTxn = await dystopikContract.createCharacter(charType);
+      await mintTxn.wait();
+    })
+
+    it("Calculates the xp value for the next level correctly", async () => {
+      const levels = [1, 5, 10, 25, 50, 100];
+      const expectedVals = [100, 2500, 10000, 62500, 250000, 1000000];
+      let lvlRes;
+      
+      for(let i = 0; i < levels.length; i++) {
+        lvlRes = await dystopikContract.nextLevelXp(levels[i]);
+        expect(lvlRes).to.equal(expectedVals[i]);
+      }
+    });
+
+    it("Prevents gaining xp without questing", async () => {
+      const xpGiven = 100;
+      const role_bytes = ethers.utils.toUtf8Bytes("XP_GIVER");
+      const XP_GIVER = ethers.utils.keccak256(role_bytes);
+      const errMsg = `AccessControl: account ${(addr1.address).toLowerCase()} is missing role ${XP_GIVER}`;
+  
+      await expect(
+        dystopikContract.connect(addr1).gainXp(charID, xpGiven)
+      ).to.be.revertedWith(errMsg);
+    });
+  
+    it("Updates Xp correctly", async () => {
+      const xpGiven = 100;
+  
+      let xpTxn = await dystopikContract.gainXp(charID, xpGiven);
+      await xpTxn.wait();
+  
+      expect(xpTxn).to.emit(dystopikContract, "gainedXp");
+  
+      let xp = await dystopikContract.xp(charID);
+      
+      expect(xp).to.equal(xpGiven);
+    });
+
+    it("Levels up correctly given sufficient xp", async () => {
+      const xpGiven = 100;
+      const expectedLvl = 2;
+  
+      let xpTxn = await dystopikContract.gainXp(charID, xpGiven);
+      await xpTxn.wait();
+
+      const beforeXp = await dystopikContract.xp(charID);
+      const beforeLvl = await dystopikContract.level(charID);
+      const xp2LevelUp = await dystopikContract.nextLevelXp(beforeLvl);
+
+      let lvlUpTxn = await dystopikContract.levelUp(charID);
+      await lvlUpTxn.wait();
+
+      expect(lvlUpTxn).to.emit(dystopikContract, "leveledUp");
+
+      const currentXp = await dystopikContract.xp(charID);
+      const currentLvl = await dystopikContract.level(charID);
+
+      expect(currentLvl).to.equal(expectedLvl);
+      expect(currentXp).to.equal(beforeXp - xp2LevelUp);
+    });
+  });
+
 });

@@ -90,6 +90,19 @@ contract Dystopik is ERC721Enumerable, AccessControl {
     }
 
     /**
+     *  This function is used to award charcters xp after a quest
+     *  @notice requires the msg.sender to be the owner or approved
+     *  @param _tokenID {uint256} - The character who will receive xp
+     *  @param _amountXp {uint256} - The amount of xp the character will be receiving
+     */
+    function gainXp(uint256 _tokenID, uint256 _amountXp) external onlyRole(XP_GIVER) {
+        require(_isApprovedOrOwner(msg.sender, _tokenID), "You do not have approval to perform this action");//Is this necessary with RBAC?
+        
+        xp[_tokenID] += _amountXp;
+        emit gainedXp(msg.sender, _tokenID, _amountXp);
+    }
+
+    /**
      *  Function to level up the character.
      *  @notice requires the msg.sender to be the owner or approved
      *  @notice requires the character to have the requisite xp to level up
@@ -132,8 +145,8 @@ contract Dystopik is ERC721Enumerable, AccessControl {
      * @param _level {uint256} - The level that is being checked for the xp requirement.
      * @return xpNextLevel {uint256} - The xp required to reach _level.
      */
-    function nextLevelXp(uint256 _level) pure internal returns(uint256){
-        uint256 baseXp = 1000;
+    function nextLevelXp(uint256 _level) pure public returns(uint256){
+        uint256 baseXp = 100;
         uint256 exponent = 2;
         uint256 xpNextLevel = baseXp * (_level ** exponent);
 
@@ -153,19 +166,6 @@ contract Dystopik is ERC721Enumerable, AccessControl {
         }else{
             return "AI";
         }
-    }
-
-    /**
-     *  This function is used to award charcters xp after a quest
-     *  @notice requires the msg.sender to be the owner or approved
-     *  @param _tokenID {uint256} - The character who will receive xp
-     *  @param _amountXp {uint256} - The amount of xp the character will be receiving
-     */
-    function gainXp(uint256 _tokenID, uint256 _amountXp) external {
-        require(_isApprovedOrOwner(msg.sender, _tokenID), "You do not have approval to perform this action");
-        
-        xp[_tokenID] += _amountXp;
-        emit gainedXp(msg.sender, _tokenID, _amountXp);
     }
 
     function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, AccessControl) returns (bool) {
