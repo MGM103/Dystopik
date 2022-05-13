@@ -7,13 +7,20 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+//libraries
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./libraries/Base64.sol";
 
+//Interfaces
+import "./interfaces/Attributes_Interface.sol";
+
 contract Dystopik is ERC721Enumerable, AccessControl {
+    //Interfaces
+    Attributes_Interface Attributes;
+    
     //Token ID
     using Counters for Counters.Counter;
     Counters.Counter public _characterID;
@@ -102,6 +109,14 @@ contract Dystopik is ERC721Enumerable, AccessControl {
         emit gainedXp(msg.sender, _tokenID, _amountXp);
     }
 
+    function setAttributesInterface(address _addressInterface) external {
+        Attributes = Attributes_Interface(_addressInterface);
+    }
+
+    function getAttributes(uint256 _tokenID) public view returns(uint256,uint256,uint256,uint256,uint256,uint256, uint256) {
+        return Attributes.idToAttributes(_tokenID);
+    }
+
     /**
      *  Function to level up the character.
      *  @notice requires the msg.sender to be the owner or approved
@@ -145,7 +160,7 @@ contract Dystopik is ERC721Enumerable, AccessControl {
      * @param _level {uint256} - The level that is being checked for the xp requirement.
      * @return xpNextLevel {uint256} - The xp required to reach _level.
      */
-    function nextLevelXp(uint256 _level) pure public returns(uint256){
+    function nextLevelXp(uint256 _level) pure public returns(uint256) {
         uint256 baseXp = 100;
         uint256 exponent = 2;
         uint256 xpNextLevel = baseXp * (_level ** exponent);
@@ -158,7 +173,7 @@ contract Dystopik is ERC721Enumerable, AccessControl {
      *  @param _architype {uint256} - This is the type or class of a character.
      *  @return {string} - The string of the type or class of the character.
      */
-    function architypeToString(uint256 _architype) public pure returns(string memory){
+    function architypeToString(uint256 _architype) public pure returns(string memory) {
         if(_architype == 1){
             return "Chimera";
         }else if(_architype == 2){
@@ -168,7 +183,11 @@ contract Dystopik is ERC721Enumerable, AccessControl {
         }
     }
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, AccessControl) returns (bool) {
+    // function tokenURI(uint256 _tokenId) public view override returns(string memory) {
+
+    // }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, AccessControl) returns(bool) {
         return super.supportsInterface(interfaceId);
     }
 }

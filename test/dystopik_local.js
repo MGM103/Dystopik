@@ -176,4 +176,34 @@ describe("Dystopik", () => {
     });
   });
 
+  describe("Attributes Interface", async () => {
+    let attributesContract;
+    let tokenID = 1;
+    let charType = 1;
+    const strength = 5, speed = 5, fortitude = 5, technical = 2, instinct = 2, dexterity = 3, luck = 3;
+
+    beforeEach(async () => {
+      const attributesFactory = await ethers.getContractFactory("Attributes");
+      attributesContract = await attributesFactory.deploy(dystopikContract.address);
+
+      await dystopikContract.setAttributesInterface(attributesContract.address);
+
+      mintTxn = await dystopikContract.createCharacter(charType);
+      await mintTxn.wait();
+    });
+
+    it("Gets the attributes of a player's character", async () => {
+      let txn = await attributesContract.setInitAttributes(tokenID, strength, speed, fortitude, technical, instinct, dexterity, luck);
+      
+      txn = await dystopikContract.getAttributes(tokenID);
+      expect(txn[0]).to.equal(strength);
+      expect(txn[1]).to.equal(speed);
+      expect(txn[2]).to.equal(fortitude);
+      expect(txn[3]).to.equal(technical);
+      expect(txn[4]).to.equal(instinct);
+      expect(txn[5]).to.equal(dexterity);
+      expect(txn[6]).to.equal(luck);
+    });
+  });
+
 });
