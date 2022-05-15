@@ -8,6 +8,7 @@
 pragma solidity ^0.8.4;
 
 import "./interfaces/Dystopik_Interface.sol";
+import "./libraries/Structs.sol";
 
 contract Attributes {
     //interface to the base contract
@@ -16,17 +17,7 @@ contract Attributes {
     //The amount of attributes characters at level one can spend
     uint256 constant initAttributePoints = 25;
 
-    struct CharAttributes {
-        uint256 strength;
-        uint256 speed;
-        uint256 fortitude;
-        uint256 technical;
-        uint256 instinct;
-        uint256 dexterity;
-        uint256 luck;
-    }
-
-    mapping(uint256 => CharAttributes) public idToAttributes;
+    mapping(uint256 => dl._CharAttributes) public idToAttributes;
     mapping(uint256 => uint256) public idToAttributePointsSpent;
     mapping(uint256 => bool) public initAttributesSet;
 
@@ -64,7 +55,7 @@ contract Attributes {
         require(calcInitAttributes(_strength, _speed, _fortitude, _technical, _instinct, _dexterity, _luck), "All initial attribute points must be used");
 
         initAttributesSet[_tokenID] = true;
-        idToAttributes[_tokenID] = CharAttributes(
+        idToAttributes[_tokenID] = dl._CharAttributes(
             _strength,
             _speed,
             _fortitude,
@@ -128,7 +119,7 @@ contract Attributes {
      */
     function increaseStr(uint256 _tokenID) external {
         updateAttributes(_tokenID);
-        CharAttributes storage attributeLvls = idToAttributes[_tokenID];
+        dl._CharAttributes storage attributeLvls = idToAttributes[_tokenID];
         attributeLvls.strength += 1;
 
         emit attributesUpgraded(msg.sender, _tokenID, attributeLvls.strength, attributeLvls.speed, attributeLvls.fortitude, attributeLvls.technical, attributeLvls.instinct, attributeLvls.dexterity, attributeLvls.luck);
@@ -140,7 +131,7 @@ contract Attributes {
      */
     function increaseSpd(uint256 _tokenID) external {
         updateAttributes(_tokenID);
-        CharAttributes storage attributeLvls = idToAttributes[_tokenID];
+        dl._CharAttributes storage attributeLvls = idToAttributes[_tokenID];
         attributeLvls.speed += 1;
 
         emit attributesUpgraded(msg.sender, _tokenID, attributeLvls.strength, attributeLvls.speed, attributeLvls.fortitude, attributeLvls.technical, attributeLvls.instinct, attributeLvls.dexterity, attributeLvls.luck);
@@ -152,7 +143,7 @@ contract Attributes {
      */
     function increaseFort(uint256 _tokenID) external {
         updateAttributes(_tokenID);
-        CharAttributes storage attributeLvls = idToAttributes[_tokenID];
+        dl._CharAttributes storage attributeLvls = idToAttributes[_tokenID];
         attributeLvls.fortitude += 1;
 
         emit attributesUpgraded(msg.sender, _tokenID, attributeLvls.strength, attributeLvls.speed, attributeLvls.fortitude, attributeLvls.technical, attributeLvls.instinct, attributeLvls.dexterity, attributeLvls.luck);
@@ -164,7 +155,7 @@ contract Attributes {
      */
     function increaseTech(uint256 _tokenID) external {
         updateAttributes(_tokenID);
-        CharAttributes storage attributeLvls = idToAttributes[_tokenID];
+        dl._CharAttributes storage attributeLvls = idToAttributes[_tokenID];
         attributeLvls.technical += 1;
 
         emit attributesUpgraded(msg.sender, _tokenID, attributeLvls.strength, attributeLvls.speed, attributeLvls.fortitude, attributeLvls.technical, attributeLvls.instinct, attributeLvls.dexterity, attributeLvls.luck);
@@ -176,7 +167,7 @@ contract Attributes {
      */
     function increaseInstinct(uint256 _tokenID) external {
         updateAttributes(_tokenID);
-        CharAttributes storage attributeLvls = idToAttributes[_tokenID];
+        dl._CharAttributes storage attributeLvls = idToAttributes[_tokenID];
         attributeLvls.instinct += 1;
 
         emit attributesUpgraded(msg.sender, _tokenID, attributeLvls.strength, attributeLvls.speed, attributeLvls.fortitude, attributeLvls.technical, attributeLvls.instinct, attributeLvls.dexterity, attributeLvls.luck);
@@ -188,7 +179,7 @@ contract Attributes {
      */
     function increaseDex(uint256 _tokenID) external {
         updateAttributes(_tokenID);
-        CharAttributes storage attributeLvls = idToAttributes[_tokenID];
+        dl._CharAttributes storage attributeLvls = idToAttributes[_tokenID];
         attributeLvls.dexterity += 1;
 
         emit attributesUpgraded(msg.sender, _tokenID, attributeLvls.strength, attributeLvls.speed, attributeLvls.fortitude, attributeLvls.technical, attributeLvls.instinct, attributeLvls.dexterity, attributeLvls.luck);
@@ -200,7 +191,7 @@ contract Attributes {
      */
     function increaseLuck(uint256 _tokenID) external {
         updateAttributes(_tokenID);
-        CharAttributes storage attributeLvls = idToAttributes[_tokenID];
+        dl._CharAttributes storage attributeLvls = idToAttributes[_tokenID];
         attributeLvls.luck += 1;
 
         emit attributesUpgraded(msg.sender, _tokenID, attributeLvls.strength, attributeLvls.speed, attributeLvls.fortitude, attributeLvls.technical, attributeLvls.instinct, attributeLvls.dexterity, attributeLvls.luck);

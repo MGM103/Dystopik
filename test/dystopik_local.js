@@ -204,6 +204,14 @@ describe("Dystopik", () => {
       expect(txn[5]).to.equal(dexterity);
       expect(txn[6]).to.equal(luck);
     });
+
+    it("Outputs the correct tokenURI", async () => {
+      let txn = await attributesContract.setInitAttributes(tokenID, strength, speed, fortitude, technical, instinct, dexterity, luck);
+      await txn.wait();
+
+      txn = await dystopikContract.tokenURI(tokenID);
+      console.log(txn);
+    });
   });
 
 });

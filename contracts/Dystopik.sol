@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./libraries/Base64.sol";
+import "./libraries/Structs.sol";
 
 //Interfaces
 import "./interfaces/Attributes_Interface.sol";
@@ -183,9 +184,74 @@ contract Dystopik is ERC721Enumerable, AccessControl {
         }
     }
 
-    // function tokenURI(uint256 _tokenId) public view override returns(string memory) {
+    function tokenURIBase(uint256 _tokenID) internal view returns(string memory) {
+        string memory currentXp = Strings.toString(xp[_tokenID]);
+        string memory nextLvlXp = Strings.toString(nextLevelXp(level[_tokenID]));
+        string memory currentLevel = Strings.toString(level[_tokenID]);
+        string memory strArchitype = architypeToString(architype[_tokenID]);
 
-    // }
+        string memory baseURI = string(abi.encodePacked('{ "trait_type": "Level", "value": ',
+            currentLevel,'}, { "trait_type": "Experience", "value": ', currentXp,', "max_value":', nextLvlXp,'}, { "trait_type": "Architype", "value": "',
+            strArchitype,'"},'
+        ));
+
+        return baseURI;
+    }
+
+    function attributesToString(uint256 _tokenID) internal view returns(dl._StrCharAttributes memory) {
+        (uint256 strength, uint256 speed, uint256 fortitude, uint256 technical, uint256 instinct, uint256 dexterity, uint256 luck) = getAttributes(_tokenID);
+
+        dl._StrCharAttributes memory strAttributes = dl._StrCharAttributes(
+            Strings.toString(strength),
+            Strings.toString(speed),
+            Strings.toString(fortitude),
+            Strings.toString(technical),
+            Strings.toString(instinct),
+            Strings.toString(dexterity),
+            Strings.toString(luck)
+        );
+
+        return strAttributes;
+    }
+
+    /**
+     * This function exists because of stack too deep. I needed to seperate the retrieval and stringifying of the attribute values.
+     */
+    function tokenURIAttributes(uint256 _tokenID) internal view returns(string memory) {
+        dl._StrCharAttributes memory _strAttributes = attributesToString(_tokenID);
+
+        string memory attributesURI = string(abi.encodePacked('{ "trait_type": "Strength", "value": ', _strAttributes.strength,
+            '}, { "trait_type": "Speed", "value": ', _strAttributes.speed,'}, { "trait_type": "Fortitude", "value": ', _strAttributes.fortitude,'}, { "trait_type": "Technical", "value": ',
+            _strAttributes.technical,'}, { "trait_type": "Instinct", "value": ', _strAttributes.instinct,'}, { "trait_type": "Dexterity", "value": ', _strAttributes.dexterity,'}, { "trait_type": "Luck", "value": ',
+            _strAttributes.luck,'}'
+        ));
+
+        return attributesURI;
+    }
+
+    function tokenURI(uint256 _tokenId) public view override returns(string memory) {
+        string memory baseURI = tokenURIBase(_tokenId);
+        string memory attributesURI = tokenURIAttributes(_tokenId);
+
+        string memory imgURI = imageURI[_tokenId];
+
+        string memory json = Base64.encode(
+            abi.encodePacked(
+                '{"name": "Dystopik',
+                ' -- NFT #: ',
+                Strings.toString(_tokenId),
+                '", "description": "Avatars for a turn based blockchain RPG", "image": "',
+                imgURI,
+                '", "attributes": [',  baseURI, attributesURI, ']}'   
+            )
+        );
+
+        string memory output = string(
+            abi.encodePacked("data:application/json;base64,", json)
+        );
+
+        return output;
+    }
 
     function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, AccessControl) returns(bool) {
         return super.supportsInterface(interfaceId);
