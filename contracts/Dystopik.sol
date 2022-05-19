@@ -190,8 +190,8 @@ contract Dystopik is ERC721Enumerable, AccessControl {
         string memory currentLevel = Strings.toString(level[_tokenID]);
         string memory strArchitype = architypeToString(architype[_tokenID]);
 
-        string memory baseURI = string(abi.encodePacked('{ "trait_type": "Level", "value": ',
-            currentLevel,'}, { "trait_type": "Experience", "value": ', currentXp,', "max_value":', nextLvlXp,'}, { "trait_type": "Architype", "value": "',
+        string memory baseURI = string(abi.encodePacked('{ "trait_type": "Level", "value": "',
+            currentLevel,'"}, { "trait_type": "Experience", "value": ', currentXp,', "max_value":', nextLvlXp,'}, { "trait_type": "Architype", "value": "',
             strArchitype,'"},'
         ));
 
@@ -220,10 +220,10 @@ contract Dystopik is ERC721Enumerable, AccessControl {
     function tokenURIAttributes(uint256 _tokenID) internal view returns(string memory) {
         dl._StrCharAttributes memory _strAttributes = attributesToString(_tokenID);
 
-        string memory attributesURI = string(abi.encodePacked('{ "trait_type": "Strength", "value": ', _strAttributes.strength,
-            '}, { "trait_type": "Speed", "value": ', _strAttributes.speed,'}, { "trait_type": "Fortitude", "value": ', _strAttributes.fortitude,'}, { "trait_type": "Technical", "value": ',
-            _strAttributes.technical,'}, { "trait_type": "Instinct", "value": ', _strAttributes.instinct,'}, { "trait_type": "Dexterity", "value": ', _strAttributes.dexterity,'}, { "trait_type": "Luck", "value": ',
-            _strAttributes.luck,'}'
+        string memory attributesURI = string(abi.encodePacked(' { "trait_type": "Strength", "value": "', _strAttributes.strength,
+            '"}, { "trait_type": "Speed", "value": "', _strAttributes.speed,'"}, { "trait_type": "Fortitude", "value": "', _strAttributes.fortitude,'"}, { "trait_type": "Technical", "value": "',
+            _strAttributes.technical,'"}, { "trait_type": "Instinct", "value": "', _strAttributes.instinct,'"}, { "trait_type": "Dexterity", "value": "', _strAttributes.dexterity,'"}, { "trait_type": "Luck", "value": "',
+            _strAttributes.luck,'"}'
         ));
 
         return attributesURI;

@@ -29,7 +29,7 @@ async function main() {
   let mintTxn = await dystopikContract.createCharacter(charType);
   await mintTxn.wait();
 
-  console.log("Setting attibutes for character...")
+  console.log("Setting attributes for character...")
   let attributesTxn = await attributesContract.setInitAttributes(tokenID, strength, speed, fortitude, technical, instinct, dexterity, luck);
   await attributesTxn.wait();
 }
