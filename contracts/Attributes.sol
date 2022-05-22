@@ -7,12 +7,12 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "./interfaces/Dystopik_Interface.sol";
+import "./interfaces/IDystopik.sol";
 import "./libraries/Structs.sol";
 
 contract Attributes {
     //interface to the base contract
-    Dystopik_Interface immutable dyst; 
+    IDystopik immutable dyst; 
     
     //The amount of attributes characters at level one can spend
     uint256 constant initAttributePoints = 25;
@@ -28,7 +28,7 @@ contract Attributes {
      *  @param _interfaceAddr {address} - The address of the base contract.
      */
     constructor(address _interfaceAddr) {
-        dyst = Dystopik_Interface(_interfaceAddr);
+        dyst = IDystopik(_interfaceAddr);
     }
 
     /**

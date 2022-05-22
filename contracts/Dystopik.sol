@@ -16,11 +16,11 @@ import "./libraries/Base64.sol";
 import "./libraries/Structs.sol";
 
 //Interfaces
-import "./interfaces/Attributes_Interface.sol";
+import "./interfaces/IAttributes.sol";
 
 contract Dystopik is ERC721Enumerable, AccessControl {
     //Interfaces
-    Attributes_Interface Attributes;
+    IAttributes Attributes;
     
     //Token ID
     using Counters for Counters.Counter;
@@ -111,7 +111,7 @@ contract Dystopik is ERC721Enumerable, AccessControl {
     }
 
     function setAttributesInterface(address _addressInterface) external {
-        Attributes = Attributes_Interface(_addressInterface);
+        Attributes = IAttributes(_addressInterface);
     }
 
     function getAttributes(uint256 _tokenID) public view returns(uint256,uint256,uint256,uint256,uint256,uint256, uint256) {
