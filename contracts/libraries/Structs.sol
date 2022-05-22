@@ -27,4 +27,19 @@ library dl {
         string dexterity;
         string luck;
     }
+
+    struct _Weapon {
+        uint256 id;
+        uint256 cost;
+        uint256 proficiency;
+        uint256 weight;
+        uint256 damage_type;
+        uint256 damage;
+        uint256 crit_chance;
+        uint256 limit;
+        string name;
+        string description;
+        string imageURI;
+        bool limit_type;
+    }
 }

@@ -12,7 +12,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./libraries/base64.sol";
+import "./libraries/Base64.sol";
+import "./libraries/Structs.sol";
 
 contract DystopikWeapons is ERC721, ERC721Enumerable, ERC721Burnable, AccessControl {
     using Counters for Counters.Counter;
@@ -20,25 +21,9 @@ contract DystopikWeapons is ERC721, ERC721Enumerable, ERC721Burnable, AccessCont
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    struct Weapon {
-        uint256 id;
-        string name;
-        string description;
-        string imageURI;
-        bool limit_type;
-        uint256 limit;
-        string ability;
-        uint256 cost;
-        uint256 proficiency;
-        uint256 weight;
-        uint256 damage_type;
-        uint256 damage;
-        uint256 crit_chance;
-    }
+    mapping(uint256 => dl._Weapon) public idToStats;
 
-    mapping(uint256 => Weapon) public idToStats;
-
-    event weaponMinted(address indexed minter, Weapon newWeapon);
+    event weaponMinted(address indexed minter, dl._Weapon newWeapon);
 
     constructor() ERC721("Dystopik Weapons", "WPNS") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
