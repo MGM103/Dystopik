@@ -33,13 +33,13 @@ library dl {
         uint256 cost;
         uint256 proficiency;
         uint256 weight;
-        uint256 damage_type;
+        uint256 damageType;
         uint256 damage;
-        uint256 crit_chance;
+        uint256 critChance;
         uint256 limit;
         string name;
         string description;
         string imageURI;
-        bool limit_type;
+        bool limitedSupply;
     }
 }
