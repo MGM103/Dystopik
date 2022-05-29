@@ -114,4 +114,11 @@ describe("WeaponManifest", () => {
             expect(txnWpnID[attributeKey]).to.equal(shivInfo.get(attributeKey));
         }  
     });
+
+    it("Returns the correct total number of weapon variants", async () => {
+        let numVariants = 3;
+        let txn = await this.manifest.totalVariants();
+
+        expect(txn).to.equal(numVariants);
+    });
 });

@@ -15,25 +15,44 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./libraries/Base64.sol";
 import "./libraries/Structs.sol";
 
+//Interfaces
+import "./interfaces/IWeaponManifest.sol";
+
 contract DystopikWeapons is ERC721, ERC721Enumerable, ERC721Burnable, AccessControl {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
+
+    //Interfaces
+    IWeaponManifest manifest;
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     mapping(uint256 => dl._Weapon) public idToStats;
 
-    event weaponMinted(address indexed minter, dl._Weapon newWeapon);
+    event weaponMinted(address indexed minter, uint256 tokenID, dl._Weapon newWeapon);
 
     constructor() ERC721("Dystopik Weapons", "WPNS") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
     }
 
-    function safeMint(address to) public onlyRole(MINTER_ROLE) {
+    //No permission atm, will be added in future to work with openzeppelin defender
+    function createWeapon(uint256 _wpnVariant) external {
+        require(_wpnVariant > 0 && _wpnVariant < manifest.totalVariants(), "Invalid Weapon Variant");
+
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
+
+        dl._Weapon memory wpnType = manifest.idToWpn(_wpnVariant);
+        idToStats[tokenId] = wpnType;
+
+        _safeMint(msg.sender, tokenId);
+        
+        emit weaponMinted(msg.sender, tokenId, wpnType);
+    }
+
+    function setManifestInterfacer(address _interfaceAddr) external {
+        manifest = IWeaponManifest(_interfaceAddr);
     }
 
     // The following functions are overrides required by Solidity.

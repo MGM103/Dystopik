@@ -10,7 +10,9 @@ pragma solidity ^0.8.4;
 import "../libraries/Structs.sol";
 
 contract WeaponManifest {
-    function idToWpn(uint256 _wpnID) public pure returns(dl._Weapon memory _weapon){
+    uint256 public immutable totalVariants = 3;
+
+    function idToWpn(uint256 _wpnID) external pure returns(dl._Weapon memory _weapon){
         if(_wpnID == 1){
             return baton();
         }else if(_wpnID == 2){
