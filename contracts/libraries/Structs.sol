@@ -29,17 +29,27 @@ library dl {
     }
 
     struct _Weapon {
-        uint256 id;
+        uint256 variantID;
         uint256 cost;
-        uint256 proficiency;
+        uint256 damageMax;
         uint256 weight;
         uint256 damageType;
-        uint256 damage;
+        uint256 damageMin;
         uint256 critChance;
         uint256 limit;
         string name;
         string description;
         string imageURI;
         bool limitedSupply;
+    }
+
+    struct _SpecialMove {
+        uint256 id;
+        string name;
+        string description;
+        bool prereq;
+        uint classPrereq;
+        uint LevelPrereq;
+        uint architypePrereq;
     }
 }
