@@ -29,7 +29,8 @@ describe("WeaponManifest", () => {
     });
 
     it("Returns correct details for the Baton weapon variant", async () => {
-        let txn, attributeKey;
+        let txn, txnWpnID, attributeKey;
+        const wpnID = 1;
         const batonInfo = new Map([
             ["variantID", 1],
             ["name", "Baton"],
@@ -47,15 +48,18 @@ describe("WeaponManifest", () => {
 
         const attributeKeys = batonInfo.keys();
         txn = await this.manifest.baton();
+        txnWpnID = await this.manifest.idToWpn(wpnID);
 
         for(i = 1; i < batonInfo.size; i++) {
             attributeKey = attributeKeys.next().value;
             expect(txn[attributeKey]).to.equal(batonInfo.get(attributeKey));
+            expect(txnWpnID[attributeKey]).to.equal(batonInfo.get(attributeKey));
         }  
     });
 
     it("Returns correct details for the Metal Rod weapon variant", async () => {
-        let txn, attributeKey;
+        let txn, txnWpnID, attributeKey;
+        const wpnID = 2;
         const metalRodInfo = new Map([
             ["variantID", 2],
             ["name", "Metal Rod"],
@@ -73,15 +77,18 @@ describe("WeaponManifest", () => {
 
         const attributeKeys = metalRodInfo.keys();
         txn = await this.manifest.metalRod();
+        txnWpnID = await this.manifest.idToWpn(wpnID);
 
         for(i = 1; i < metalRodInfo.size; i++) {
             attributeKey = attributeKeys.next().value;
             expect(txn[attributeKey]).to.equal(metalRodInfo.get(attributeKey));
+            expect(txnWpnID[attributeKey]).to.equal(metalRodInfo.get(attributeKey));
         }  
     });
 
     it("Returns correct details for the Shiv weapon variant", async () => {
-        let txn, attributeKey;
+        let txn, txnWpnID, attributeKey;
+        const wpnID = 3;
         const shivInfo = new Map([
             ["variantID", 3],
             ["name", "Shiv"],
@@ -99,10 +106,12 @@ describe("WeaponManifest", () => {
 
         const attributeKeys = shivInfo.keys();
         txn = await this.manifest.shiv();
+        txnWpnID = await this.manifest.idToWpn(wpnID);
 
         for(i = 1; i < shivInfo.size; i++) {
             attributeKey = attributeKeys.next().value;
             expect(txn[attributeKey]).to.equal(shivInfo.get(attributeKey));
+            expect(txnWpnID[attributeKey]).to.equal(shivInfo.get(attributeKey));
         }  
     });
 });
