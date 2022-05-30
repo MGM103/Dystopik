@@ -18,7 +18,7 @@ import "./libraries/Structs.sol";
 //Interfaces
 import "./interfaces/IWeaponManifest.sol";
 
-contract DystopikWeapons is ERC721, ERC721Enumerable, ERC721Burnable, AccessControl {
+contract Weapons is ERC721, ERC721Enumerable, ERC721Burnable, AccessControl {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
 
@@ -34,6 +34,7 @@ contract DystopikWeapons is ERC721, ERC721Enumerable, ERC721Burnable, AccessCont
     constructor() ERC721("Dystopik Weapons", "WPNS") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
+        _tokenIdCounter.increment(); //start at 1
     }
 
     //No permission atm, will be added in future to work with openzeppelin defender
@@ -51,7 +52,7 @@ contract DystopikWeapons is ERC721, ERC721Enumerable, ERC721Burnable, AccessCont
         emit weaponMinted(msg.sender, tokenId, wpnType);
     }
 
-    function setManifestInterfacer(address _interfaceAddr) external {
+    function setManifestInterface(address _interfaceAddr) external {
         manifest = IWeaponManifest(_interfaceAddr);
     }
 
