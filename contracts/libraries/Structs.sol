@@ -43,13 +43,16 @@ library dl {
         bool limitedSupply;
     }
 
-    struct _SpecialMove {
-        uint256 id;
-        string name;
-        string description;
-        bool prereq;
-        uint classPrereq;
-        uint LevelPrereq;
-        uint architypePrereq;
+    struct _BattleStats {
+        uint256 damageMin;
+        uint256 damageMax;
+        uint256 critChance;
+        uint256 speed;
+        uint256 health;
+        uint256 defence;
+        uint256 evasiveness;
+        uint256 stunResist;
+        uint256 bleedResist;
+        int128 shockResist;
     }
 }
