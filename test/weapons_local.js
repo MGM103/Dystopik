@@ -6,7 +6,7 @@ async function deploy(name, ...params) {
     return await newContract.deploy(...params).then(c => c.deployed());
 }
 
-describe("Dystopik Weapons Contract", () => {
+describe("Weapons", () => {
     beforeEach(async () => {
         this.wpnContract = await deploy("Weapons");
         this.manifestContract = await deploy("WeaponManifest");
@@ -57,5 +57,13 @@ describe("Dystopik Weapons Contract", () => {
                 expect(wpnStats[attributeKey]).to.equal(manifestTxn[attributeKey]);
             }
         }
+    });
+
+    it("Creates the correct tokenURI", async () => {
+        const wpnVariant = 1;
+        const wpnID = 1;
+        let txn = await this.wpnContract.createWeapon(wpnVariant);
+        txn = await this.wpnContract.tokenURI(wpnID);
+        console.log(txn);
     });
 });

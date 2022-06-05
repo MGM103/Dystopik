@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "./libraries/Base64.sol";
 import "./libraries/Structs.sol";
 
@@ -39,7 +40,7 @@ contract Weapons is ERC721, ERC721Enumerable, ERC721Burnable, AccessControl {
 
     //No permission atm, will be added in future to work with openzeppelin defender
     function createWeapon(uint256 _wpnVariant) external {
-        require(_wpnVariant > 0 && _wpnVariant < manifest.totalVariants(), "Invalid Weapon Variant");
+        require(_wpnVariant > 0 && _wpnVariant <= manifest.totalVariants(), "Invalid Weapon Variant");
 
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
@@ -50,6 +51,45 @@ contract Weapons is ERC721, ERC721Enumerable, ERC721Burnable, AccessControl {
         _safeMint(msg.sender, tokenId);
         
         emit weaponMinted(msg.sender, tokenId, wpnType);
+    }
+
+    function tokenURI(uint256 _tokenId) public view override returns(string memory){
+        dl._Weapon memory wpnData = idToStats[_tokenId];
+        string memory supplyStr = tokenURILimitedSupply(wpnData);
+        string memory wpnType = manifest.wpnTypeToStr(wpnData.damageType);
+
+        string memory json = Base64.encode(
+            abi.encodePacked(
+                '{"name": "', wpnData.name,
+                '", "description": "', wpnData.description, '", "image": "',
+                wpnData.imageURI,
+                '", "attributes": [{ "trait_type": "Damage Type", "value": "', wpnType,
+                '"}, ', supplyStr, ', {"trait_type": "Cost", "value":"', Strings.toString(wpnData.cost), '"}, {"trait_type": "Weight", "value":"', 
+                Strings.toString(wpnData.weight), '"}, {"trait_type": "Min Damage", "value":"', Strings.toString(wpnData.damageMin), 
+                '"}, {"trait_type": "Max Damage", "value":"', Strings.toString(wpnData.damageMax), '"}, {"trait_type": "Crit Chance", "value":"', 
+                Strings.toString(wpnData.critChance), '"}]}'   
+            )
+        );
+
+        string memory output = string(
+            abi.encodePacked("data:application/json;base64,", json)
+        );
+
+        return output;
+    }
+
+    function tokenURILimitedSupply(dl._Weapon memory _wpn) internal pure returns(string memory){
+        if(_wpn.limitedSupply){
+            string memory limitedSupplyStr = string(abi.encodePacked(
+                '{ "trait_type": "Limited Supply", "value": "true"}, {"trait_type": "Max Limit", "value":', _wpn.limit, '}'
+            ));
+            return limitedSupplyStr;
+        }else {
+            string memory limitedSupplyStr = string(abi.encodePacked(
+                '{ "trait_type": "Limited Supply", "value": "false"}'
+            ));
+            return limitedSupplyStr;
+        }
     }
 
     function setManifestInterface(address _interfaceAddr) external {

@@ -22,7 +22,7 @@ contract WeaponManifest {
         }
     }
 
-    function wpnTypeToString(uint256 _typeID) public pure returns(string memory strTypeID){
+    function wpnTypeToStr(uint256 _typeID) external pure returns(string memory strTypeID){
         if(_typeID == 1){
             return "Slashing";
         }else if(_typeID == 2){
